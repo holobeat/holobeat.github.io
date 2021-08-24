@@ -1,46 +1,287 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Zobyte, Inc. - Software development, Desktop, Mobile, Multi-platform</title>
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
     body {
-      font-family: arial;
+      font-family: 'Roboto', sans-serif;
       margin: 0;
+      color: rgb(87, 87, 87);
+      background-color: rgb(240, 240, 240);
+      position: relative;
+      overflow-x: hidden;
     }
+
+    .top-shadow {
+      position: absolute;
+      top: 0px;
+      left: -100px;
+      right: -100px;
+      height: 10px;
+      -webkit-box-shadow: inset 0px 6px 5px rgba(50, 50, 50, 0.75);
+      -moz-box-shadow: inset 0px 6px 5px rgba(50, 50, 50, 0.75);
+      box-shadow: inset 0px 6px 5px rgba(50, 50, 50, 0.75);
+    }
+
     .header {
-      padding-top: 60px;
+      padding-top: 40px;
     }
+
     .container {
       left: 50%;
       width: 580px;
       margin: 0 auto;
       text-align: center;
-      font-size: 1.7em;
+      font-size: 1.4em;
     }
+
+    .logo {
+      width: 300px;
+    }
+
+    .card {
+      position: relative;
+      padding: 20px;
+      margin-top: 30px;
+      border-radius: 4px;
+      background-color: rgb(255, 255, 255);
+      /* border: 1px solid rgb(223, 223, 223); */
+      box-shadow: 5px 5px 15px gray;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+
+    .card-icon {
+      max-height: 100px;
+    }
+
+    .card-icon-container {
+      padding: 10px;
+      display: flex;
+    }
+
+    .card-content {
+      margin: 10px;
+      padding-left: 18px;
+      text-align: left;
+      border-left: 1px solid silver;
+    }
+
+    .card-content-app {
+      font-size: .9em;
+    }
+
+    .bold {
+      font-weight: bold;
+    }
+
+    .launch {
+      display: flex;
+      flex-direction: row;
+      align-content: center;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .launch-now {
+        text-decoration: none;
+        color: black;
+        background-color: lightskyblue;
+        padding: 4px;
+        padding-left: 8px;
+        padding-right: 8px;
+        border-radius: 17px;
+        font-size: 0.8em;
+        border: 1px solid rgb(131, 196, 236);
+      }
+
+      .contact {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        background-color: lightskyblue;
+        padding: 4px;
+        padding-left: 15px;
+        padding-right: 10px;
+        border-radius: 15px 0 0 0;
+      }
+
+      .contact > a {
+        
+        text-decoration: none;
+        color: black;
+        font-size: 0.7em;
+      }
+
     @media (max-width: 580px) {
       body {
-        margin: 20px;
+        margin-top: 10px;
+        background-color: silver;
+        box-shadow: none;
       }
+
+      .top-shadow {
+        display: none;
+      }
+
       .header {
         padding-top: 10px;
       }
+
       .container {
         margin: 0;
         width: 100%;
-        font-size: 1.7em;
+        font-size: 1.4em;
       }
+
+      .card {
+        padding: 0px;
+        margin: 8px;
+        margin-top: 10px;
+        border-radius: 5px;
+        border: 1px solid rgb(128, 128, 128);
+        box-shadow: inset 0 0 5px #000000;
+      }
+
+      .card-icon {
+        max-height: 60px;
+        align-self: center;
+      }
+
+      .card-icon-container {
+        padding: 10px;
+        padding-left: 15px;
+        display: flex;
+      }
+
+      .card-content {
+        margin: 10px;
+        padding-left: 10px;
+        text-align: left;
+        border-left: 1px solid silver;
+      }
+
+      .card-content-no-icon {
+        padding: 15px;
+        text-align: left;
+        border-left: none;
+      }
+
+      .contact {
+        box-shadow: inset -1px -1px 3px #474747;
+      }
+    }
+
+    @media (max-width: 375px) {
+      body {
+        background-color: silver;
+        box-shadow: none;
+      }
+
+      .top-shadow {
+        display: none;
+      }
+
+      .container {
+        font-size: 1.0em;
+      }
+
+      .logo {
+        width: 200px;
+      }
+
+      .card {
+        padding: 0px;
+        margin: 8px;
+        margin-top: 10px;
+        border-radius: 5px;
+        border: 1px solid rgb(128, 128, 128);
+        box-shadow: inset 0 0 5px #000000;
+      }
+
+      .card-icon {
+        max-height: 50px;
+        align-self: center;
+      }
+
+      .card-icon-container {
+        padding: 10px;
+        text-align: center;
+        display: flex;
+      }
+
+      .card-content {
+        margin: 10px;
+        margin-left: 0;
+        padding-left: 10px;
+        text-align: left;
+        border-left: 1px solid silver;
+      }
+
+      .card-content-no-icon {
+        padding: 10px;
+        text-align: left;
+        border-left: none;
+      }
+
+      .launch {
+        flex-direction: column;
+      }
+
     }
   </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1 class="header">ZOBYTE</h1>
-        <h3>Software development and integrated solutions. Web, mobile and desktop application development.</h3>
-        <p>Zobyte develops applications for multiple platforms, desktop or mobile. From PC to Mac to Linux, Windows, Android or iOS, we are dedicated to providing the best quality, value and service to our clients.</p>
+  <!-- <div class="top-shadow"></div> -->
+  <div class="container">
+    <div class="header">
+      <img class="logo" src="img/zobyte-logo.svg" alt="ZOBYTE" />
     </div>
-  </body>
+    <div class="card bold">
+      <div class="card-icon-container">
+        <img class="card-icon" src="img/multi-device.svg" />
+      </div>
+      <div class="card-content">
+        Software development and integrated solutions.
+        Web, mobile and desktop application development.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-content-no-icon" style="text-align: justify; font-size: 0.9em;">
+        Zobyte develops applications for multiple platforms, desktop or mobile.
+        From PC to Mac to Linux, Windows, Android or iOS, we are dedicated to
+        providing the best quality, value and service to our clients.
+      </div>
+      <div class="contact"><a href="https://forms.gle/sDs3rDRpZeBijiXR6">CONTACT &#x27A7;</a></div>
+    </div>
+    <div class="card">
+      <div class="card-icon-container">
+        <img class="card-icon" src="img/big-counter-icon.svg" />
+      </div>
+      <div class="card-content card-content-app">
+      <div style="border-bottom: 1px solid silver; margin-bottom: 5px;"><b>Free App: Big counter</b></div>
+        Use this app as a tally counter, count the rounds,
+        repetitions, or use it as an in-office counter for the clients
+        waiting in the queue.<br>
+        <div class="launch">
+          <a href="big-counter/" class="launch-now">&#x27A7; LAUNCH NOW</a>
+          <div style="padding-left: 10px; padding-right: 10px;">or</div>
+          <img src="img/get-it-on-google-play-icon-logo.png" style="width: 100px;" />
+        </div>
+      </div>
+    </div>
+    <br>
+
+</body>
+
 </html>
