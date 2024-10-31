@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
+    <title>HIIT Exercise Counter and Timer</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            font-family: 'Russo One', Arial, sans-serif;
+            background-color: #323232;
+        }
+
+        button {
+            border-radius: .5em;
+            font-family: 'Russo One', Arial, sans-serif;
+        }
+
+        #app {
+            display: flex;
+            height: 88%;
+            width: 100%;
+            max-width: 600px;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        #start-screen {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+            background-color: #535353;
+            border: 5px solid rgb(134, 134, 134);
+            box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-sizing: border-box;
+        }
+
+        #exercise-screen {
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+            padding: 20px;
+            background-color: #535353;
+            border: 5px solid rgb(134, 134, 134);
+            box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            box-sizing: border-box;
+            row-gap: 1em;
+        }
+
+        #exercise-screen div {
+            display: flex;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            flex-grow: 1;
+            height: 30%;
+        }
+
+        #repetition-buttons {
+            text-align: center;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 300px;
+
+        }
+
+        .repetition-button {
+            padding: 20px;
+            background-color: #414141;
+            color: rgb(223, 223, 223);
+            /* border: 2px solid #007bff; */
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s;
+            font-size: 2em;
+            /* font-weight: bold; */
+        }
+
+        .repetition-button.active {
+            background-color: #007bff;
+            color: #ffffff;
+        }
+
+        #start-button {
+            padding: 1em;
+            margin-top: 1em;
+            font-size: 2.2em;
+            color: white;
+            /* background-color: #007bff; */
+            background-color: #414141;
+            border: none;
+            cursor: pointer;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #session-message {
+            font-size: 2em;
+            padding-top: 1em;
+            color: rgb(255, 240, 35);
+        }
+
+        #exercise-progress {
+            background-color: #414141;
+            color: white;
+            border-radius: 15px;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            font-size: calc(1rem + 0.8vw + 1.5vh);
+        }
+
+        #exercise-name {
+            background-color: #2e2d3f;
+            color: white;
+            border-radius: 15px;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            font-size: calc(1rem + 0.8vw + 1.5vh);
+        }
+
+        #exercise-timer {
+            background-color: #414141;
+            color: white;
+            border-radius: 15px;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            font-size: calc(1rem + 4vw + 6vh);
+        }
+
+        @media screen and (max-height: 600px) {
+            #start-screen {
+                flex-direction: row;
+                column-gap: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <div>
+                <div style="color: white; font-size: 1.8rem; margin-bottom: 1rem;">Choose repetitions:</div>
+                <div id="repetition-buttons"></div>
+            </div>
+            <div>
+                <button id="start-button">START</button>
+                <div id="session-message"></div>
+            </div>
+        </div>
+
+        <!-- Exercise Screen -->
+        <div id="exercise-screen" style="display:none;">
+            <div id="exercise-progress"></div>
+            <div id="exercise-name"></div>
+            <div id="exercise-timer"></div>
+        </div>
+    </div>
+    <script>
+        class Beeper {
+            constructor() {
+                this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            beep(duration = 200, frequency = 1174, volume = 0.5) {
+                // Create an oscillator to generate the sound wave
+                const oscillator = this.audioContext.createOscillator();
+                oscillator.type = "sine"; // Type of wave: 'sine', 'square', 'sawtooth', 'triangle'
+                oscillator.frequency.value = frequency; // Frequency in Hz
+
+                // Create a gain node to control the volume
+                const gainNode = this.audioContext.createGain();
+                gainNode.gain.value = volume;
+
+                // Connect the nodes: oscillator -> gain -> audio context (speakers)
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+
+                // Start and stop the beep sound
+                oscillator.start(this.audioContext.currentTime);
+                oscillator.stop(this.audioContext.currentTime + duration / 1000);
+            }
+        }
+
+        var beeper;
+
+        const exercisePlan = {
+            "warmup": [
+                { "name": "Jumping jacks", "duration": 60 },
+                { "name": "Arm circles forward", "duration": 30 },
+                { "name": "Arm circles backward", "duration": 30 },
+                { "name": "Left Leg swings", "duration": 30 },
+                { "name": "Right Leg swings", "duration": 30 },
+                { "name": "Bodyweight squats", "duration": 60 },
+                { "name": "Lunges", "duration": 60 }
+            ],
+            "hiitWorkout": [
+                { "name": "Squat jumps", "duration": 30 },
+                { "name": "Rest", "duration": 30 },
+                { "name": "Lunges", "duration": 30 },
+                { "name": "Rest", "duration": 30 },
+                // -
+                { "name": "Push-ups", "duration": 30 },
+                { "name": "Rest", "duration": 30 },
+                { "name": "Plank to push-up", "duration": 30 },
+                { "name": "Rest", "duration": 120 },
+                // // -
+                { "name": "Mountain climbers", "duration": 30 },
+                { "name": "Rest", "duration": 30 },
+                { "name": "Bicycle crunches", "duration": 30 },
+                { "name": "Rest", "duration": 120 },
+                // // -
+                { "name": "Burpees", "duration": 30 },
+                { "name": "Rest", "duration": 30 },
+                { "name": "High knees", "duration": 30 },
+                { "name": "Rest", "duration": 60 }
+            ],
+            "cooldown": [
+                { "name": "Stretching", "duration": 300 }
+            ]
+        };
+
+        // App logic
+        const repetitionButtonsContainer = document.getElementById("repetition-buttons");
+        const startButton = document.getElementById("start-button");
+        const startScreen = document.getElementById("start-screen");
+        const exerciseScreen = document.getElementById("exercise-screen");
+        const exerciseName = document.getElementById("exercise-name");
+        const exerciseTimer = document.getElementById("exercise-timer");
+        const exerciseProgress = document.getElementById("exercise-progress");
+        const sessionMessage = document.getElementById("session-message");
+        let repetitionsTotal = null;
+
+        // Repetition buttons logic
+        for (let i = 1; i <= 9; i++) {
+            const button = document.createElement("button");
+            button.className = "repetition-button";
+            button.textContent = i;
+            button.onclick = () => {
+                document.querySelectorAll(".repetition-button").forEach(btn => btn.classList.remove("active"));
+                button.classList.add("active");
+                repetitionsTotal = i;
+            };
+            repetitionButtonsContainer.appendChild(button);
+        }
+
+        // Start button logic
+        startButton.onclick = () => {
+            if (repetitionsTotal !== null) {
+                startScreen.style.display = "none";
+                exerciseScreen.style.display = "flex";
+                beeper = new Beeper();
+                startExercise();
+            } else {
+                alert("Please select the number of repetitions.");
+            }
+        };
+
+        const PART_WARMUP = 0;
+        const PART_HIIT = 1;
+        const PART_COOLDOWN = 2;
+
+        // Exercise logic
+        let currentExerciseIndex = 0;
+        let currentExerciseDisplayIndex = 0; // skips the "Rest" type exercises
+        let currentPartIndex = PART_WARMUP; // Start with warmup
+        let repetitionCounter = 1;
+        let exerciseCountPerRound = null;
+        let intervalId = null;
+
+        setDefaultRepetition();
+
+        function getExerciseCountPerRound(exercises) {
+            return exercises.filter(
+                (e) => {
+                    return e.name.toLowerCase() != 'rest';
+                }
+            ).length;
+        }
+
+        function setDefaultRepetition() {
+            // set default repetition count
+            repetitionButtonsContainer.children[0].click();
+        }
+
+        function startExercise() {
+            nextExercise();
+        }
+
+        function nextExercise() {
+            let exercises;
+            if (currentPartIndex === PART_WARMUP) {
+                exercises = exercisePlan.warmup;
+            } else if (currentPartIndex === PART_COOLDOWN) {
+                exercises = exercisePlan.cooldown;
+            } else {
+                exercises = exercisePlan.hiitWorkout;
+            }
+            exerciseCountPerRound = getExerciseCountPerRound(exercises);
+
+
+            if (currentExerciseIndex < exercises.length) {
+                const exercise = exercises[currentExerciseIndex];
+                exerciseName.textContent = exercise.name;
+                if (exercise.name.toLowerCase() != 'rest') currentExerciseDisplayIndex++;
+                updateExerciseUI();
+                startCountdown(exercise.duration, () => {
+                    // executes when timer is at zero
+                    currentExerciseIndex++;
+                    beeper.beep();
+                    nextExercise();
+                });
+            } else if (currentPartIndex === PART_WARMUP) {
+                // Move from warmup to HIIT workout
+                currentPartIndex = PART_HIIT;
+                currentExerciseIndex = 0;
+                currentExerciseDisplayIndex = 0;
+                nextExercise();
+            } else if (repetitionCounter < repetitionsTotal) {
+                // If the current repetition is not complete, repeat the round
+                currentExerciseIndex = 0;
+                repetitionCounter++;
+                currentExerciseDisplayIndex = 0;
+                nextExercise();
+            } else if (currentPartIndex === PART_HIIT) {
+                // cooldown
+                currentPartIndex = PART_COOLDOWN;
+                currentExerciseIndex = 0;
+                currentExerciseDisplayIndex = 0;
+                nextExercise();
+            } else {
+                currentExerciseIndex = 0;
+                currentExerciseDisplayIndex = 0;
+                sessionMessage.innerHTML = "SESSION<br>COMPLETE!";
+                resetApp();
+            }
+        }
+
+        function startCountdown(duration, callback) {
+            let timeLeft = duration;
+            exerciseTimer.textContent = timeLeft;
+            intervalId = setInterval(() => {
+                timeLeft--;
+                exerciseTimer.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(intervalId);
+                    callback();
+                }
+            }, 1000);
+        }
+
+        function startCooldown() {
+            exerciseName.textContent = "Cool-down";
+            const cooldown = exercisePlan.cooldown[0];
+            startCountdown(cooldown.duration, () => {
+
+                resetApp();
+            });
+        }
+
+        function resetApp() {
+            startScreen.style.display = "flex";
+            exerciseScreen.style.display = "none";
+            currentPartIndex = PART_WARMUP;
+            currentExerciseIndex = 0;
+            repetitionCounter = 1;
+            repetitionsTotal = null;
+            document.querySelectorAll(".repetition-button").forEach(btn => btn.classList.remove("active"));
+            setDefaultRepetition();
+        }
+
+        function updateExerciseUI() {
+            if (currentPartIndex === PART_WARMUP) {
+                exerciseProgress.innerHTML = `Warm-up<br>Exercise ${currentExerciseDisplayIndex} of ${exerciseCountPerRound}`;
+            } else if (currentPartIndex == PART_COOLDOWN) {
+                exerciseProgress.innerHTML = `Cooldown<br>Exercise ${currentExerciseDisplayIndex} of ${exerciseCountPerRound}`;
+            } else {
+                exerciseProgress.innerHTML = `Round ${repetitionCounter} of ${repetitionsTotal}<br>Exercise ${currentExerciseDisplayIndex} of ${exerciseCountPerRound}`;
+            }
+        }
+    </script>
+</body>
+
+</html>
