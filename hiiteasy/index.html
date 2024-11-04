@@ -409,13 +409,13 @@
             if (currentExerciseIndex < exercises.length) {
                 const exercise = exercises[currentExerciseIndex];
                 exerciseName.textContent = exercise.name;
-                // readAloud(exercise.name);
+                readAloud(exercise.name);
                 if (exercise.name.toLowerCase() != 'rest') currentExerciseDisplayIndex++;
                 updateExerciseUI();
                 startCountdown(exercise.duration, () => {
                     // executes when timer is at zero
                     currentExerciseIndex++;
-                    // beeper.beep();
+                    beeper.beep();
                     nextExercise();
                 });
             } else if (currentPartIndex === PART_WARMUP) {
