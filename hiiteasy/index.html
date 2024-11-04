@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Stay on track with your HIIT workouts! This simple, single-page HIIT Exercise Counter and Timer app helps you manage intervals and exercise counts effortlessly. Perfect for high-intensity training, circuit routines, and quick workouts." />
     <link href="https://fonts.googleapis.com/css2?family=Russo+One&display=swap" rel="stylesheet">
     <title>HIIT Exercise Counter and Timer</title>
     <style>
@@ -28,6 +30,7 @@
 
         #app {
             display: flex;
+            padding: 20px;
             height: 88%;
             width: 100%;
             max-width: 600px;
@@ -74,7 +77,7 @@
             align-items: center;
             color: white;
             flex-grow: 1;
-            height: 30%;
+            height: inherit;
         }
 
         #repetition-buttons {
@@ -83,21 +86,18 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
             margin-bottom: 20px;
-            width: 300px;
-
+            width: 100%;
         }
 
         .repetition-button {
             padding: 20px;
             background-color: #414141;
             color: rgb(223, 223, 223);
-            /* border: 2px solid #007bff; */
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             cursor: pointer;
             border: none;
             transition: background-color 0.3s;
             font-size: 2em;
-            /* font-weight: bold; */
         }
 
         .repetition-button.active {
@@ -110,7 +110,6 @@
             margin-top: 1em;
             font-size: 2.2em;
             color: white;
-            /* background-color: #007bff; */
             background-color: #414141;
             border: none;
             cursor: pointer;
@@ -124,11 +123,26 @@
         }
 
         #exercise-progress {
+            position: relative;
             background-color: #414141;
             color: white;
             border-radius: 15px;
             box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
             font-size: calc(1rem + 0.8vw + 1.5vh);
+            overflow: hidden;
+        }
+
+        #exercise-progress-text {
+            position: absolute;
+        }
+
+        #exercise-progress-bar {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            background-color: green;
+            width: 0%;
         }
 
         #exercise-name {
@@ -147,10 +161,54 @@
             font-size: calc(1rem + 4vw + 6vh);
         }
 
+        #logo {
+            margin-top: .2em;
+            margin-bottom: .5em;
+            font-size: 3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            color: #F7CA05;
+            text-shadow: 0 2px 7px rgba(0, 0, 0, 0.4), 0 -2px 1px #fff;
+            animation: glitch 1.3s linear infinite;
+        }
+
         @media screen and (max-height: 600px) {
             #start-screen {
                 flex-direction: row;
                 column-gap: 2rem;
+            }
+
+            #logo {
+                position: absolute;
+                right: .5em;
+                top: .5em;
+                font-size: 2em;
+            }
+        }
+
+        @keyframes glitch {
+            0% {
+                transform: translate(0);
+            }
+
+            20% {
+                transform: translate(-2px, 2px);
+            }
+
+            40% {
+                transform: translate(-2px, -2px);
+            }
+
+            60% {
+                transform: translate(2px, 2px);
+            }
+
+            80% {
+                transform: translate(2px, -2px);
+            }
+
+            100% {
+                transform: translate(0);
             }
         }
     </style>
@@ -160,9 +218,12 @@
     <div id="app">
 
         <!-- Start Screen -->
-        <div id="start-screen">
+        <div id="start-screen" style="position: relative">
+            <div id="logo">
+                <span style="color: red;">HIIT</span> Easy!
+            </div>
             <div>
-                <div style="color: white; font-size: 1.8rem; margin-bottom: 1rem;">Choose repetitions:</div>
+                <div style="color: white; font-size: 1.8rem; margin-bottom: 1rem;">Choose repetitions</div>
                 <div id="repetition-buttons"></div>
             </div>
             <div>
@@ -173,7 +234,10 @@
 
         <!-- Exercise Screen -->
         <div id="exercise-screen" style="display:none;">
-            <div id="exercise-progress"></div>
+            <div id="exercise-progress">
+                <div id="exercise-progress-bar"></div>
+                <div id="exercise-progress-text"></div>
+            </div>
             <div id="exercise-name"></div>
             <div id="exercise-timer"></div>
         </div>
@@ -206,41 +270,49 @@
 
         var beeper;
 
-        const exercisePlan = {
-            "warmup": [
-                { "name": "Jumping jacks", "duration": 60 },
-                { "name": "Arm circles forward", "duration": 30 },
-                { "name": "Arm circles backward", "duration": 30 },
-                { "name": "Left Leg swings", "duration": 30 },
-                { "name": "Right Leg swings", "duration": 30 },
-                { "name": "Bodyweight squats", "duration": 60 },
-                { "name": "Lunges", "duration": 60 }
-            ],
-            "hiitWorkout": [
-                { "name": "Squat jumps", "duration": 30 },
-                { "name": "Rest", "duration": 30 },
-                { "name": "Lunges", "duration": 30 },
-                { "name": "Rest", "duration": 30 },
-                // -
-                { "name": "Push-ups", "duration": 30 },
-                { "name": "Rest", "duration": 30 },
-                { "name": "Plank to push-up", "duration": 30 },
-                { "name": "Rest", "duration": 120 },
-                // // -
-                { "name": "Mountain climbers", "duration": 30 },
-                { "name": "Rest", "duration": 30 },
-                { "name": "Bicycle crunches", "duration": 30 },
-                { "name": "Rest", "duration": 120 },
-                // // -
-                { "name": "Burpees", "duration": 30 },
-                { "name": "Rest", "duration": 30 },
-                { "name": "High knees", "duration": 30 },
-                { "name": "Rest", "duration": 60 }
-            ],
-            "cooldown": [
-                { "name": "Stretching", "duration": 300 }
-            ]
-        };
+        const plans = [
+            {
+                "meta": {
+                    "name": "Bodyweight HIIT"
+                },
+                "warmup": [
+                    { "name": "Jumping jacks", "duration": 30 },
+                    { "name": "Arm circles forward", "duration": 30 },
+                    { "name": "Arm circles backward", "duration": 30 },
+                    { "name": "Left Leg swings", "duration": 30 },
+                    { "name": "Right Leg swings", "duration": 30 },
+                    { "name": "Bodyweight squats", "duration": 30 },
+                    { "name": "Lunges", "duration": 30 },
+                    { "name": "Rest", "duration": 20 },
+                ],
+                "hiitWorkout": [
+                    { "name": "Squat jumps", "duration": 20 },
+                    { "name": "Rest", "duration": 30 },
+                    { "name": "Lunges", "duration": 20 },
+                    { "name": "Rest", "duration": 30 },
+                    //
+                    { "name": "Push-ups", "duration": 20 },
+                    { "name": "Rest", "duration": 30 },
+                    { "name": "Plank to push-up", "duration": 20 },
+                    { "name": "Rest", "duration": 120 },
+                    //
+                    { "name": "Mountain climbers", "duration": 20 },
+                    { "name": "Rest", "duration": 30 },
+                    { "name": "Bicycle crunches", "duration": 20 },
+                    { "name": "Rest", "duration": 120 },
+                    //
+                    { "name": "Burpees", "duration": 20 },
+                    { "name": "Rest", "duration": 30 },
+                    { "name": "High knees", "duration": 20 },
+                    { "name": "Rest", "duration": 60 }
+                ],
+                "cooldown": [
+                    { "name": "Stretching", "duration": 300 }
+                ]
+            }
+        ];
+
+        let plan = plans[0];
 
         // App logic
         const repetitionButtonsContainer = document.getElementById("repetition-buttons");
@@ -250,6 +322,8 @@
         const exerciseName = document.getElementById("exercise-name");
         const exerciseTimer = document.getElementById("exercise-timer");
         const exerciseProgress = document.getElementById("exercise-progress");
+        const exerciseProgressText = document.getElementById("exercise-progress-text");
+        const exerciseProgressBar = document.getElementById("exercise-progress-bar");
         const sessionMessage = document.getElementById("session-message");
         let repetitionsTotal = null;
 
@@ -289,6 +363,8 @@
         let repetitionCounter = 1;
         let exerciseCountPerRound = null;
         let intervalId = null;
+        let totalSeconds = 0;
+        let totalSecondsRemaining = 0;
 
         setDefaultRepetition();
 
@@ -300,23 +376,32 @@
             ).length;
         }
 
+        function getTotalSeconds(plan) {
+            return ['warmup', 'hiitWorkout', 'cooldown'].reduce(
+                (acc, p) => acc + plan[p].reduce((a, v) => a + v.duration, 0),
+                0
+            )
+        }
+
         function setDefaultRepetition() {
             // set default repetition count
             repetitionButtonsContainer.children[0].click();
         }
 
         function startExercise() {
+            totalSeconds = getTotalSeconds(plan);
+            totalSecondsRemaining = totalSeconds;
             nextExercise();
         }
 
         function nextExercise() {
             let exercises;
             if (currentPartIndex === PART_WARMUP) {
-                exercises = exercisePlan.warmup;
+                exercises = plan.warmup;
             } else if (currentPartIndex === PART_COOLDOWN) {
-                exercises = exercisePlan.cooldown;
+                exercises = plan.cooldown;
             } else {
-                exercises = exercisePlan.hiitWorkout;
+                exercises = plan.hiitWorkout;
             }
             exerciseCountPerRound = getExerciseCountPerRound(exercises);
 
@@ -324,12 +409,13 @@
             if (currentExerciseIndex < exercises.length) {
                 const exercise = exercises[currentExerciseIndex];
                 exerciseName.textContent = exercise.name;
+                // readAloud(exercise.name);
                 if (exercise.name.toLowerCase() != 'rest') currentExerciseDisplayIndex++;
                 updateExerciseUI();
                 startCountdown(exercise.duration, () => {
                     // executes when timer is at zero
                     currentExerciseIndex++;
-                    beeper.beep();
+                    // beeper.beep();
                     nextExercise();
                 });
             } else if (currentPartIndex === PART_WARMUP) {
@@ -353,7 +439,7 @@
             } else {
                 currentExerciseIndex = 0;
                 currentExerciseDisplayIndex = 0;
-                sessionMessage.innerHTML = "SESSION<br>COMPLETE!";
+                sessionMessage.innerHTML = "SESSION COMPLETE!";
                 resetApp();
             }
         }
@@ -363,6 +449,8 @@
             exerciseTimer.textContent = timeLeft;
             intervalId = setInterval(() => {
                 timeLeft--;
+                totalSecondsRemaining--;
+                exerciseProgressBar.style.width = `${100 - Math.floor(totalSecondsRemaining / totalSeconds * 100)}%`;
                 exerciseTimer.textContent = timeLeft;
                 if (timeLeft <= 0) {
                     clearInterval(intervalId);
@@ -373,9 +461,8 @@
 
         function startCooldown() {
             exerciseName.textContent = "Cool-down";
-            const cooldown = exercisePlan.cooldown[0];
+            const cooldown = plan.cooldown[0];
             startCountdown(cooldown.duration, () => {
-
                 resetApp();
             });
         }
@@ -383,6 +470,8 @@
         function resetApp() {
             startScreen.style.display = "flex";
             exerciseScreen.style.display = "none";
+            exerciseProgressBar.style.width = '0%';
+            totalSeconds = 0;
             currentPartIndex = PART_WARMUP;
             currentExerciseIndex = 0;
             repetitionCounter = 1;
@@ -393,13 +482,30 @@
 
         function updateExerciseUI() {
             if (currentPartIndex === PART_WARMUP) {
-                exerciseProgress.innerHTML = `Warm-up<br>Exercise ${currentExerciseDisplayIndex} of ${exerciseCountPerRound}`;
+                exerciseProgressText.innerHTML = `Warm-up<br>Exercise ${currentExerciseDisplayIndex} of ${exerciseCountPerRound}`;
             } else if (currentPartIndex == PART_COOLDOWN) {
-                exerciseProgress.innerHTML = `Cooldown<br>Exercise ${currentExerciseDisplayIndex} of ${exerciseCountPerRound}`;
+                exerciseProgressText.innerHTML = `Cooldown<br>Exercise ${currentExerciseDisplayIndex} of ${exerciseCountPerRound}`;
             } else {
-                exerciseProgress.innerHTML = `Round ${repetitionCounter} of ${repetitionsTotal}<br>Exercise ${currentExerciseDisplayIndex} of ${exerciseCountPerRound}`;
+                exerciseProgressText.innerHTML = `Round ${repetitionCounter} of ${repetitionsTotal}<br>Exercise ${currentExerciseDisplayIndex} of ${exerciseCountPerRound}`;
             }
         }
+
+        function readAloud(text) {
+            // Check if the Speech Synthesis API is available in the browser
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+
+                // Optionally set properties like language, pitch, rate, etc.
+                utterance.lang = 'en-US'; // Set language
+                utterance.pitch = 1;      // Set pitch (0-2)
+                utterance.rate = 1;       // Set rate (0.1-10)
+                utterance.volume = 1;     // Set volume (0-1)
+
+                // Start speaking
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
     </script>
 </body>
 
